@@ -1,0 +1,36 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: vqa
+      POSTGRES_PASSWORD: vqa
+      POSTGRES_DB: vqa
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vqa -d vqa"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      VQA_DATABASE_URL: postgresql://vqa:vqa@db:5432/vqa
+      VQA_EMBEDDING_BACKEND: ${VQA_EMBEDDING_BACKEND:-hash}
+      VQA_VLM_PROVIDER: ${VQA_VLM_PROVIDER:-none}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    command: uvicorn vqa.api:app --host 0.0.0.0 --port 8000
+
+volumes:
+  pgdata:

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vqa"
+version = "0.3.0"
+description = "Vision-model image analysis pipeline: automated product-photo quality assessment with pgvector similarity retrieval"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Rajavamshi" }]
+keywords = ["computer-vision", "clip", "multimodal", "pgvector", "image-quality", "vector-search"]
+dependencies = [
+    "numpy>=1.24",
+    "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+# Local CLIP/SigLIP embeddings
+models = ["torch>=2.1", "open-clip-torch>=2.24"]
+# Postgres + pgvector storage
+db = ["psycopg[binary,pool]>=3.1", "pgvector>=0.2.5"]
+# REST service
+api = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "python-multipart>=0.0.9"]
+# Multimodal critique providers
+vlm = ["anthropic>=0.34", "openai>=1.30"]
+demo = ["streamlit>=1.42", "pandas>=2.0"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+all = ["vqa[models,db,api,vlm,demo,dev]"]
+
+[project.scripts]
+vqa = "vqa.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "UP", "B"]
+ignore = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

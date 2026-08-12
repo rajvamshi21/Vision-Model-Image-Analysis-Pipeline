@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 620" width="1020" height="620" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#57606a"/>
+    </marker>
+    <style>
+      .box { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; rx: 10; }
+      .accent { fill: #f6f8fa; stroke: #adbac7; stroke-width: 1.5; rx: 10; }
+      .opt { fill: #ffffff; stroke: #adbac7; stroke-width: 1.5; stroke-dasharray: 5 4; rx: 10; }
+      .t { font-size: 14px; font-weight: 600; fill: #1f2328; }
+      .s { font-size: 11.5px; fill: #57606a; }
+      .lbl { font-size: 11px; fill: #57606a; font-style: italic; }
+      .grp { font-size: 13px; font-weight: 700; fill: #1f2328; letter-spacing: .04em; }
+      .ln { stroke: #57606a; stroke-width: 1.6; fill: none; marker-end: url(#arrow); }
+      .ln-d { stroke: #8c959f; stroke-width: 1.4; fill: none; stroke-dasharray: 5 4; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1020" height="620" fill="#ffffff"/>
+  <text x="24" y="30" class="grp">VISION QA PIPELINE — DATA FLOW</text>
+
+  <!-- stage 1: source -->
+  <rect class="box" x="24" y="150" width="168" height="76"/>
+  <text x="108" y="180" class="t" text-anchor="middle">Image source</text>
+  <text x="108" y="200" class="s" text-anchor="middle">folder · upload · object store</text>
+  <text x="108" y="216" class="s" text-anchor="middle">SHA-256 dedupe</text>
+
+  <!-- stage 2: prepare -->
+  <rect class="box" x="228" y="150" width="168" height="76"/>
+  <text x="312" y="180" class="t" text-anchor="middle">Prepare</text>
+  <text x="312" y="200" class="s" text-anchor="middle">decode · EXIF transpose</text>
+  <text x="312" y="216" class="s" text-anchor="middle">flatten alpha · ≤1024 px</text>
+
+  <!-- stage 3: analysers -->
+  <rect class="accent" x="432" y="56" width="222" height="66"/>
+  <text x="543" y="82" class="t" text-anchor="middle">Technical heuristics</text>
+  <text x="543" y="102" class="s" text-anchor="middle">acutance · exposure · noise · bg · framing</text>
+
+  <rect class="accent" x="432" y="138" width="222" height="66"/>
+  <text x="543" y="164" class="t" text-anchor="middle">Encoder</text>
+  <text x="543" y="184" class="s" text-anchor="middle">OpenCLIP / SigLIP → 512-d unit vector</text>
+
+  <rect class="accent" x="432" y="220" width="222" height="66"/>
+  <text x="543" y="246" class="t" text-anchor="middle">Zero-shot attributes</text>
+  <text x="543" y="266" class="s" text-anchor="middle">contrastive prompt pairs → probabilities</text>
+
+  <rect class="opt" x="432" y="302" width="222" height="66"/>
+  <text x="543" y="328" class="t" text-anchor="middle">VLM critique</text>
+  <text x="543" y="348" class="s" text-anchor="middle">Claude / GPT — only for borderline images</text>
+
+  <!-- stage 4: scoring -->
+  <rect class="box" x="694" y="138" width="150" height="106"/>
+  <text x="769" y="168" class="t" text-anchor="middle">Scoring</text>
+  <text x="769" y="189" class="s" text-anchor="middle">weighted mean</text>
+  <text x="769" y="205" class="s" text-anchor="middle">+ worst sub-score</text>
+  <text x="769" y="221" class="s" text-anchor="middle">+ issue rules</text>
+
+  <rect class="box" x="880" y="138" width="116" height="106"/>
+  <text x="938" y="172" class="t" text-anchor="middle">Quality</text>
+  <text x="938" y="190" class="t" text-anchor="middle">report</text>
+  <text x="938" y="212" class="s" text-anchor="middle">score · verdict</text>
+  <text x="938" y="228" class="s" text-anchor="middle">issues + remedies</text>
+
+  <!-- storage -->
+  <rect class="accent" x="228" y="418" width="616" height="122"/>
+  <text x="252" y="444" class="grp">PostgreSQL 16 + pgvector</text>
+
+  <rect class="box" x="252" y="456" width="176" height="66"/>
+  <text x="340" y="480" class="t" text-anchor="middle">images</text>
+  <text x="340" y="500" class="s" text-anchor="middle">metadata · SKU · hash</text>
+
+  <rect class="box" x="444" y="456" width="196" height="66"/>
+  <text x="542" y="480" class="t" text-anchor="middle">image_embeddings</text>
+  <text x="542" y="500" class="s" text-anchor="middle">vector(512) · HNSW cosine</text>
+
+  <rect class="box" x="656" y="456" width="168" height="66"/>
+  <text x="740" y="480" class="t" text-anchor="middle">quality_reports</text>
+  <text x="740" y="500" class="s" text-anchor="middle">JSONB · versioned</text>
+
+  <!-- consumers -->
+  <rect class="box" x="24" y="418" width="168" height="34"/>
+  <text x="108" y="440" class="t" text-anchor="middle">CLI · vqa ingest</text>
+  <rect class="box" x="24" y="462" width="168" height="34"/>
+  <text x="108" y="484" class="t" text-anchor="middle">FastAPI service</text>
+  <rect class="box" x="24" y="506" width="168" height="34"/>
+  <text x="108" y="528" class="t" text-anchor="middle">Streamlit review UI</text>
+
+  <!-- arrows -->
+  <path class="ln" d="M 192 188 H 222"/>
+  <path class="ln" d="M 396 188 C 414 188 414 89 426 89"/>
+  <path class="ln" d="M 396 188 H 426"/>
+  <path class="ln" d="M 396 188 C 414 188 414 253 426 253"/>
+  <path class="ln-d" d="M 396 188 C 414 188 410 335 426 335"/>
+
+  <path class="ln" d="M 654 89 C 676 89 674 160 688 160"/>
+  <path class="ln" d="M 654 171 H 688"/>
+  <path class="ln" d="M 654 253 C 676 253 674 200 688 200"/>
+  <path class="ln-d" d="M 654 335 C 682 335 676 222 688 222"/>
+  <text x="432" y="386" class="lbl">invoked only when the cheap signals are ambiguous (score &lt; 75)</text>
+
+  <path class="ln" d="M 844 191 H 874"/>
+
+  <path class="ln" d="M 938 244 V 380 H 762 V 412"/>
+  <text x="926" y="292" class="lbl" text-anchor="end">one write per image:</text>
+  <text x="926" y="308" class="lbl" text-anchor="end">row + vector + report</text>
+
+  <path class="ln" d="M 228 470 H 198"/>
+  <path class="ln" d="M 228 490 C 214 490 210 500 198 512"/>
+  <path class="ln" d="M 228 452 C 214 452 210 444 198 436"/>
+
+  <text x="24" y="576" class="s">Cosine similarity search runs in Postgres (embedding &lt;=&gt; query) so retrieval stays correct beyond what fits in memory.</text>
+  <text x="24" y="596" class="s">Every stage degrades gracefully: no GPU → perceptual-hash encoder; no API key → heuristics + zero-shot only.</text>
+</svg>
