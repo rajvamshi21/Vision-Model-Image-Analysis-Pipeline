@@ -60,9 +60,12 @@ def test_otsu_separates_a_bimodal_distribution():
 def test_luminance_matches_rec709():
     white = np.ones((2, 2, 3), dtype=np.float32)
     assert np.allclose(luminance(white), 1.0)
-    green = np.zeros((1, 1, 3), dtype=np.float32)
-    green[..., 1] = 1.0
-    assert abs(float(luminance(green)) - 0.7152) < 1e-5
+    # One pure primary at a time must recover its Rec.709 coefficient.
+    # Note: .item(), not float() -- NumPy >= 2.3 rejects float() on ndim > 0.
+    for channel, expected in enumerate((0.2126, 0.7152, 0.0722)):
+        pixel = np.zeros((1, 1, 3), dtype=np.float32)
+        pixel[..., channel] = 1.0
+        assert abs(luminance(pixel).item() - expected) < 1e-5
 
 
 def test_resolution_subscore_tracks_the_short_side():

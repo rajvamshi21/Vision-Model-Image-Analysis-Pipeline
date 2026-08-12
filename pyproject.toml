@@ -46,3 +46,9 @@ ignore = ["B008"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+# NumPy 1.25 deprecated float()/int() on ndim > 0 arrays; NumPy 2.3 made it an
+# error. Promoting just that warning means the bug fails on every interpreter
+# instead of only whichever CI job happens to resolve the newest NumPy.
+filterwarnings = [
+    "error:Conversion of an array with ndim > 0 to a scalar:DeprecationWarning",
+]
